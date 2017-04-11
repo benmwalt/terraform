@@ -1,0 +1,38 @@
+wget https://apt.puppetlabs.com/puppetlabs-release-pc1-xenial.deb
+sudo dpkg -i puppetlabs-release-pc1-xenial.deb
+sudo apt -y update
+sudo apt-get -y install puppetserver
+
+#sort out /etc/hosts
+
+#Create certs
+sudo puppet master --verbose --no-daemonize
+
+#Install Apache2 web server
+sudo apt-get install apache2 ruby rubygems
+sudo a2enmod ssl
+sudo a2enmod headers
+sudo gem install rack passenger
+sudo passenger-install-apache2-module
+
+# this is an interactive setup script. here are the things it told me to do:
+
+apt-get install build-essential libcurl4-openssl-dev apache2-dev ruby-dev zlib1g-dev libapr1-dev libaprutil1-dev
+sudo dd if=/dev/zero of=/swap bs=1M count=1024
+sudo mkswap /swap
+sudo swapon /swap
+
+wget https://raw.github.com/puppetlabs/puppet/stable/ext/rack/config.ru
+
+sudo mkdir -p /usr/share/puppet/rack/puppetmasterd
+sudo mkdir /usr/share/puppet/rack/puppetmasterd/public /usr/share/puppet/rack/puppetmasterd/tmp
+sudo cp config.ru /usr/share/puppet/rack/puppetmasterd
+sudo chown puppet:puppet /usr/share/puppet/rack/puppetmasterd/config.ru
+
+#upload puppetmaster site config file to server, then
+sudo cp puppetmaster /etc/apache2/sites-available/
+sudo a2ensite puppetmaster
+
+# apparently it's good to enable always_cache_features in [master] conf
+
+
